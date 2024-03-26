@@ -9,7 +9,9 @@ const fs = require("fs");
 const canvas = createCanvas(400, 400);
 const ctx = canvas.getContext("2d");
 
-const fileNames = fs.readdirSync(constants.RAW_DIR);
+const files = fs.readdirSync(constants.RAW_DIR );
+
+const fileNames = files.splice(0,200);
 const samples = [];
 let id = 1;
 
@@ -36,6 +38,10 @@ fileNames.forEach((fn) => {
     id++;
   }
 });
+
+fs.writeFileSync(constants.SAMPLES,
+  JSON.stringify(samples)
+);
 
 fs.writeFileSync(
   constants.SAMPLES_JS,
