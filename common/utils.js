@@ -23,6 +23,24 @@ utils.groupBy = (arr, key) => {
   return groups;
 };
 
+utils.flaggedUsers = [
+  1663855616443,
+  1663860827761,
+  1663864583532,
+];
+
+utils.styles = {
+  car: {color:' #00f',text:'🚗'},
+  fish: {color:' #f00',text:'🐟'},
+  house: {color:' #0f0',text:'🏚'},
+  tree: {color:' #f0f',text:'🌳'},
+  bicycle: {color:' #0ff',text:'🚴'},
+  guitar: {color:' #ff0',text:'🎸'},
+  pencil: {color:' #ff0',text:'📝'},
+  clock: {color:' #ff0',text:'🕒'},
+};
+ 
+
 if (typeof module !== "undefined") {
   module.exports = utils;
 }

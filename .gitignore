@@ -1,3 +1,4 @@
-data/img/*.png
-data/json/*.json
-sample.json
+/data/dataset/img/*.png
+data/dataset/json/*.json
+samples.json
+node_modules
