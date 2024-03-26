@@ -1,0 +1,11 @@
+{
+  "name": "ml",
+  "version": "0.0.1",
+  "description": "Mashinen learning with js",
+  "main": "index.html",
+  "author": "Schlucht OTS",
+  "license": "MIT",
+  "dependencies": {
+    "canvas": "2.11.2"
+  }
+}
