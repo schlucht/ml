@@ -1,10 +1,20 @@
-// import { Point } from "../primitives/point.js"
-// import { Segments } from "../primitives/segment.js"
+import { Point } from "../primitives/point.js"
+import { Segments } from "../primitives/segment.js"
+
 
 class Graph {
     constructor(points = [], segments = []) {
         this.points = points
         this.segments = segments
+    }
+
+    static load(info) {
+        const points = info.points.map((i) => new Point(i.x, i.y))
+        const segments = info.segments.map((i) => new Segments(
+            points.find((p) => p.equals(i.p1)),
+            points.find((p) => p.equals(i.p2))
+        ))
+        return new Graph(points, segments);
     }
 
     addPoint(point) {
