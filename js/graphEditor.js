@@ -1,93 +1,91 @@
-import { Point } from "./primitives/point.js"
-import { Segments } from "./primitives/segment.js"
-import { getNearestPoint } from "./math/utils.js"
 
+import { getNearestPoint } from "./math/utils.js";
+import { Segment } from "./primitives/segment.js";
 
 class GraphEditor {
-    constructor(viewport, graph) {
-        this.viewport = viewport
-        this.canvas = viewport.canvas        
-        this.graph = graph
+   constructor(viewport, graph) {
+      this.viewport = viewport;
+      this.canvas = viewport.canvas;
+      this.graph = graph;
 
-        this.ctx = this.canvas.getContext("2d")
+      this.ctx = this.canvas.getContext("2d");
 
-        this.mouse = null
-        this.hovered = null
-        this.dragging = false
-        this.selected = null
+      this.selected = null;
+      this.hovered = null;
+      this.dragging = false;
+      this.mouse = null;
 
-        this. #addEventListeners();
+      this.#addEventListeners();
+   }
 
-    }
+   #addEventListeners() {
+      this.canvas.addEventListener("mousedown", this.#handleMouseDown.bind(this));
+      this.canvas.addEventListener("mousemove", this.#handleMouseMove.bind(this));
+      this.canvas.addEventListener("contextmenu", (evt) => evt.preventDefault());
+      this.canvas.addEventListener("mouseup", () => this.dragging = false);
+   }
 
-    #addEventListeners() {
-        this.canvas.addEventListener("mousedown", this.#handleMouseDown.bind(this))
-        this.canvas.addEventListener("mousemove", this.#handleMouseMove.bind(this))
-        this.canvas.addEventListener('contextmenu', (e) => e.preventDefault())
-        this.canvas.addEventListener("mouseup", (e) => () => this.dragging = false)
-    }
+   #handleMouseMove(evt) {
+      this.mouse = this.viewport.getMouse(evt, true);
+      this.hovered = getNearestPoint(this.mouse, this.graph.points, 10 * this.viewport.zoom);
+      if (this.dragging == true) {
+         this.selected.x = this.mouse.x;
+         this.selected.y = this.mouse.y;
+      }
+   }
 
-    #handleMouseMove(e) {
-       this.mouse = new Point(e.offsetX, e.offsetY);
-       
-       this.hovered = getNearestPoint(this.mouse, this.graph.points, 10)
+   #handleMouseDown(evt) {
+      if (evt.button == 2) { // right click
+         if (this.selected) {
+            this.selected = null;
+         } else if (this.hovered) {
+            this.#removePoint(this.hovered);
+         }
+      }
+      if (evt.button == 0) { // left click
+         if (this.hovered) {
+            this.#select(this.hovered);
+            this.dragging = true;
+            return;
+         }
+         this.graph.addPoint(this.mouse);
+         this.#select(this.mouse);
+         this.hovered = this.mouse;
+      }
+   }
 
-       if (this.dragging == true) {        
-            this.selected.x = this.mouse.x
-            this.selected.y = this.mouse.y
-       }
+   #select(point) {
+      if (this.selected) {
+         this.graph.tryAddSegment(new Segment(this.selected, point));
+      }
+      this.selected = point;
+   }
 
-    }
+   #removePoint(point) {
+      this.graph.removePoint(point);
+      this.hovered = null;
+      if (this.selected == point) {
+         this.selected = null;
+      }
+   }
 
-    #handleMouseDown(e) {
-        if (e.button == 2) {
-            if (this.selected) {
-                this.selected = null
-            } else if (this.hovered) {
-                this.#removePoint(this.hovered)
-            }
-        }
-        if (e.button == 0) {
-            if (this.hovered) {
-                this.#select(this.hovered)
-                this.dragging = true
-                return
-            }
-            this.graph.addPoint(this.mouse)
-            this.#select(this.mouse)
-            this.hovered = this.mouse
-        }
-    }
+   dispose() {
+      this.graph.dispose();
+      this.selected = null;
+      this.hovered = null;
+   }
 
-    #select(point){
-        if (this.selected) {
-            this.graph.tryAddSegment(new Segments(this.selected, point))
-        }
-        this.selected = point
-    }
-
-    #removePoint(point) {
-        this.graph.removePoint(point)
-        this.hovered = null
-        if (this.selected == point) {
-            this.selected = null
-        }
-    }
-
-        /**
-     * Display the graph and any hovered or selected elements on the canvas.
-     */    
-    display() {
-        this.graph.draw(this.ctx)
-        if (this.hovered) {
-            this.hovered.draw(this.ctx, {fill: true})
-        }
-        if (this.selected) {
-            const intent = this.hovered ? this.hovered : this.mouse
-            new Segments(this.selected, intent).draw(this.ctx, { dash: [3, 3]})
-            this.selected.draw(this.ctx, {outline: true})
-        }
-    }
+   display() {
+      this.graph.draw(this.ctx);
+      if (this.hovered) {
+         this.hovered.draw(this.ctx, { fill: true });
+      }
+      if (this.selected) {
+         const intent = this.hovered ? this.hovered : this.mouse;
+         new Segment(this.selected, intent).draw(this.ctx, { dash: [3, 3] });
+         this.selected.draw(this.ctx, { outline: true });
+      }
+   }
 }
 
 export { GraphEditor }
